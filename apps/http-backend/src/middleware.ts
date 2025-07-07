@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 
 export function middleware(req: Request, res: Response, next: NextFunction){
     const token = req.headers["authorization"] ?? "";
-    const decode = jwt.verify(token, "iamyash");
+    const decode = jwt.verify(token, "hello");
 
     if (decode) {
         //@ts-ignore

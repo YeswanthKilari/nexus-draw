@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "exports":{
-    "./types": "./src/types.ts"
+    "./types": "./dist/types.js"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "type": "module",
+  
+    "scripts": {
+      "build": "tsc -b"
+    },
+  
+  
   "devDependencies": {
     "@repo/typescript-config": "workspace:*"
   },

@@ -2,6 +2,7 @@
   "name": "http-backend",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc -b",
     "start": "node ./dist/index.js",
@@ -14,7 +15,8 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "@repo/backend-common": "workspace:*",
-    "@repo/common": "workspace:*"
+    "@repo/common": "workspace:*",
+    "@repo/db": "workspace:*"
   },
   "keywords": [],
   "author": "",
