@@ -8,15 +8,16 @@
     "start": "node ./dist/index.js",
     "dev": "npm run build && npm run start"
   },
-  
   "dependencies": {
-    "@repo/typescript-config": "workspace:*",
-    "@types/jsonwebtoken": "^9.0.10",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
     "@repo/backend-common": "workspace:*",
     "@repo/common": "workspace:*",
-    "@repo/db": "workspace:*"
+    "@repo/db": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/dotenv": "^8.2.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "dotenv": "^17.0.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +25,5 @@
   "description": "",
   "devDependencies": {
     "@types/express": "^5.0.3"
-    
   }
 }
-

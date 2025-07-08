@@ -1,10 +1,13 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
 import { middleware } from "./middleware.js";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { createroomschema, userschema, signinschema } from "@repo/common/types";
 import { prismaClient } from "@repo/db";
 
+dotenv.config();
 const app = express();
 const port: number = 3001;
 app.use(express.json());
