@@ -91,17 +91,52 @@ app.post("/room", middleware, async (req: Request, res: Response): any => {
   }
 //@ts-ignore
   const userId = req.userId;
-  const room = await prismaClient.room.create({
-    data: {
-      slug: parseddata.data.name,
-      adminId: userId,
-    }
-  })
-  res.json({
-    message: "Room created successfully",
-    roomid: room.id,
-  });
+  try {
+    const room = await prismaClient.room.create({
+      data: {
+        slug: parseddata.data.name,
+        adminId: userId,
+      }
+    })
+    res.json({
+      message: "Room created successfully",
+      roomid: room.id,
+    });
+  } catch (error) {
+    console.error("Error creating room:", error);
+    res.status(500).json({
+      message: "Error creating room",
+      error: (error as Error).message,
+    });
+  }
 });
+
+
+//@ts-ignore
+app.get("/chats/:id", async (req: Request, res: Response): any => {
+  const roomId = Number(req.params.id);
+  if (isNaN(roomId)) {
+    return res.status(400).json({ message: "Invalid room ID" });
+  }
+  try {
+    const messages = await prismaClient.chat.findMany({
+      where: {
+        roomId: roomId,
+      },
+      orderBy: {
+        id: "desc"
+      },
+      take: 50
+    })
+    res.json(messages);
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    res.status(500).json({
+      message: "Error fetching messages",
+      error: (error as Error).message,
+    });
+  }
+})
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

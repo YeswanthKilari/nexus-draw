@@ -1,93 +1,122 @@
-
 import { WebSocketServer } from "ws";
 import type { WebSocket } from "ws";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
+import { prismaClient } from "@repo/db";
+import dotenv from "dotenv";
+dotenv.config();
 
 const wss = new WebSocketServer({ port: 8080 });
 
 interface Users {
-    ws: WebSocket;
-    userId: string;
-    rooms: string[];
+  ws: WebSocket;
+  userId: string;
+  rooms: string[];
 }
 
 const users: Users[] = [];
 
 function checkUser(token: string): string | null {
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET, );
-        if (typeof decoded == "string") {
-            console.error("Decoded token is a string, expected an object");
-            return null;
-        }
-        if (!(decoded as jwt.JwtPayload).userId) {
-            console.error("Token does not contain userId");
-            return null;
-        }
-
-        return decoded.userId as string;
-    } catch (error) {
-        console.error("Token verification failed:", error);
-        return null;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (typeof decoded === "string") {
+      console.error("Decoded token is a string, expected an object");
+      return null;
     }
+    if (!(decoded as jwt.JwtPayload).userId) {
+      console.error("Token does not contain userId");
+      return null;
+    }
+
+    return (decoded as jwt.JwtPayload).userId as string;
+  } catch (error) {
+    console.error("Token verification failed:", error);
     return null;
+  }
 }
 
-wss.on("connection", function connection(ws,request) {
-    const url = request.url;
-    if (!url) {
-        return;
-    }
-    const urlParams = new URLSearchParams(url.split("?")[1]);
-    const token = urlParams.get("token");
-    const userId = checkUser(token || "");
-    if (!userId) {
-        ws.close(1008, "Invalid token");
-        return;
-    }
-    console.log("Decoded Token");
+wss.on("connection", function connection(ws, request) {
+  const url = request.url;
+  if (!url) return;
 
+  const urlParams = new URLSearchParams(url.split("?")[1]);
+  const token = urlParams.get("token");
+  const userId = checkUser(token || "");
 
-    users.push({
-        ws: ws,
-        userId,
-        rooms: []
-    })
+  if (!userId) {
+    ws.close(1008, "Invalid token");
+    return;
+  }
 
-    
-    ws.on("message", function message(data) {
-        const parsedData = JSON.parse(data.toString())
-        if (parsedData.type === "join_room") {
-            const user = users.find(x => x.ws === ws);
-            if (!user) {
-                return;
+  console.log("✅ Connection established for user:", userId);
+
+  users.push({
+    ws: ws,
+    userId,
+    rooms: [],
+  });
+
+  ws.on("message", async function message(data) {
+    try {
+      const parsedData = JSON.parse(data.toString());
+
+      const user = users.find((x) => x.ws === ws);
+      if (!user) return;
+
+      switch (parsedData.type) {
+        case "join_room":
+          if (!parsedData.roomId) return;
+          user.rooms.push(parsedData.roomId);
+          console.log(`User ${user.userId} joined room ${parsedData.roomId}`);
+          break;
+
+        case "leave_room":
+          if (!parsedData.roomId) return;
+          user.rooms = user.rooms.filter((room) => room !== parsedData.roomId);
+          console.log(`User ${user.userId} left room ${parsedData.roomId}`);
+          break;
+
+        case "chat":
+          const roomId = Number(parsedData.roomId); 
+          const roomKey = String(parsedData.roomId); 
+          const message = parsedData.message;
+
+          if (!roomId || !message) {
+            ws.send(JSON.stringify({ error: "Invalid chat format" }));
+            return;
+          }
+
+          // Save to DB
+         await prismaClient.chat.create({
+            data: {
+              userId: user.userId,
+              roomId: roomId,
+              message: message,
+            },
+          });
+
+          users.forEach((u) => {
+            if (u.rooms.includes(roomKey)) {
+              u.ws.send(
+                JSON.stringify({
+                  type: "chat",
+                  roomKey,
+                  message,
+                })
+              );
             }
-            user.rooms.push(parsedData.room);
-        }
+          });
 
-        if (parsedData.type === "leave_room") {
-            const user = users.find(x => x.ws === ws);
-            if (!user) {
-                return;
-            }
-            user.rooms = user.rooms.filter(room => room !== parsedData.room);
-        }
+          break;
+      }
+    } catch (err) {
+      console.error("❌ Message handling error:", err);
+      ws.send(JSON.stringify({ error: "Internal server error" }));
+      ws.close(1011, "Internal error");
+    }
+  });
 
-        if (parsedData.type === "chat") {
-            const roomId = parsedData.userId;
-            const message = parsedData.message;
-
-            users.forEach(user => {
-                if (user.rooms.includes(roomId)) {
-                    user.ws.send(JSON.stringify({
-                        type: "chat",
-                        roomId,
-                        message,
-                        room: parsedData.room
-                    }));
-                }
-            } )
-        }
-    });
-})
+  ws.on("close", (code, reason) => {
+    console.log(`🔌 WebSocket disconnected: [${code}] ${reason.toString()}`);
+  });
+});
