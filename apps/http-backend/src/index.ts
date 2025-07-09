@@ -44,7 +44,7 @@ app.post("/signup", async (req: Request, res: Response) => {
 });
 
 //@ts-ignore
-app.post("/signin",async (req: Request, res: Response): any => {
+app.post("/signin", async (req: Request, res: Response): any => {
   const data = userschema.safeParse(req.body);
   if (!data.success) {
     return res.status(400).json({
@@ -57,26 +57,28 @@ app.post("/signin",async (req: Request, res: Response): any => {
     where: {
       email: data.data.username,
       password: data.data.password,
-    }
-  })
+    },
+  });
 
   if (!user) {
     return res.status(401).json({
       message: "Invalid username or password",
     });
   }
+
   const token = jwt.sign(
     {
-      useId: user?.id
+      userId: user.id, 
     },
     JWT_SECRET
   );
 
   res.json({
-    message: "User signed in successfully",
+    message: "User signed check",
     token,
   });
 });
+
 
 //@ts-ignore
 app.post("/room", middleware, async (req: Request, res: Response): any => {
