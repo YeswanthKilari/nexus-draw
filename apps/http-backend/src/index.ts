@@ -79,7 +79,6 @@ app.post("/signin", async (req: Request, res: Response): any => {
   });
 });
 
-
 //@ts-ignore
 app.post("/room", middleware, async (req: Request, res: Response): any => {
   const parseddata = createroomschema.safeParse(req.body);
@@ -113,7 +112,7 @@ app.post("/room", middleware, async (req: Request, res: Response): any => {
 
 
 //@ts-ignore
-app.get("/chats/:id", async (req: Request, res: Response): any => {
+app.get("/chats/:id",middleware, async (req: Request, res: Response): any => {
   const roomId = Number(req.params.id);
   if (isNaN(roomId)) {
     return res.status(400).json({ message: "Invalid room ID" });
