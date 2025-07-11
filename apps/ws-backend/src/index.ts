@@ -66,7 +66,7 @@ wss.on("connection", function connection(ws, request) {
       switch (parsedData.type) {
         case "join_room":
           if (!parsedData.roomId) return;
-          user.rooms.push(String(parsedData.roomId)); // Store as string
+          user.rooms.push(String(parsedData.roomId)); 
           console.log(`User ${user.userId} joined room ${parsedData.roomId}`);
           break;
 
