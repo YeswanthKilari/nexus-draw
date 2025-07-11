@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation"
 
 export default function Home() {
     const Router = useRouter()
-  return (
+    return (
+      
     <div className="flex w-full h-screen overflow-hidden text-white">
       <div className="w-[60%] bg-[#080808] flex items-center justify-center">
         <div className="w-[80%] h-[80%] dark:bg-black bg-blue-300 rounded-xl overflow-hidden">
@@ -22,7 +23,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="w-[40%] bg-[#080808] p-6 flex flex-col gap-6">
+      <div className="w-[40%] bg-[#080808] pt-6 pr-6 pb-6 pl-0 flex flex-col gap-6">
           {/* Theme Toggle */}
           <div className="flex justify-end">
             <ModeToggle />

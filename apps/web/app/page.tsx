@@ -22,13 +22,13 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="w-[40%] bg-[#080808] p-6 flex flex-col gap-6">
+      <div className="w-[40%] bg-[#080808] pt-6 pr-6 pb-6 pl-0 flex flex-col gap-6">
           {/* Theme Toggle */}
           <div className="flex justify-end">
             <ModeToggle />
           </div>
 
-          <div className="w-full flex flex-col items-center mt-20">
+          <div className="w-full flex flex-col items-center mt-20 mr-40">
             <h1 className="text-4xl font-bold text-center">Create Your Account</h1>
             <p className="text-[#8a8895] mt-2 text-sm">
               Already have an account?{" "}
