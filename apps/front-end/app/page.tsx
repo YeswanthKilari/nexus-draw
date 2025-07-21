@@ -1,9 +1,12 @@
 'use client';
 
+import { useRouter } from "next/navigation"
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+
+
 import { 
   ArrowRight, 
   Users, 
@@ -24,6 +27,7 @@ export default function Home() {
     setIsVisible(true);
   }, []);
 
+  const Router = useRouter()
   return (
     <main className="min-h-screen bg-white">
       {/* Navigation */}
@@ -40,10 +44,14 @@ export default function Home() {
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-gray-600 hover:text-black transition-colors">Features</a>
               <a href="#examples" className="text-gray-600 hover:text-black transition-colors">Examples</a>
-              <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white">
+              <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white" onClick={() =>
+                Router.push("/signin")
+              }>
                 Sign In
               </Button>
-              <Button className="bg-black text-white hover:bg-purple-600">
+              <Button className="bg-black text-white hover:bg-purple-600" onClick={() => {
+                Router.push("/signin")
+              }}>
                 Get Started
               </Button>
             </div>

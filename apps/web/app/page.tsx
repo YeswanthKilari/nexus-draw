@@ -1,6 +1,6 @@
 "use client"
 
-import { ModeToggle } from "./components/dark"
+import { ModeToggle } from "../../front-end/components/ui/dark"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"

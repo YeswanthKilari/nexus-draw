@@ -1,5 +1,6 @@
 {
   "extends": "@repo/typescript-config/nextjs.json",
+  "darkMode": "class",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -17,7 +18,7 @@
     "next-env.d.ts",
     "next.config.js",
     ".next/types/**/*.ts"
-  ],
+, "../front-end/components/ui/dark.tsx", "../front-end/components/theme-provider.tsx"  ],
   "exclude": [
     "node_modules"
   ]
