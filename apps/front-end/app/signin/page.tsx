@@ -13,7 +13,7 @@ export default function Home() {
         <div className="w-[80%] h-[80%] dark:bg-black bg-blue-300 rounded-xl overflow-hidden">
           <video
             className="w-full h-full object-cover  rounded-xl"
-            src="/img_video/1448735-uhd_4096_2160_24fps.mp4" 
+            src="/img_video/signin.mp4" 
             autoPlay
             muted
             loop
