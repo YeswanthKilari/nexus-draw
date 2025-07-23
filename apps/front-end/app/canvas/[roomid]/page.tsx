@@ -1,26 +1,16 @@
-"use client"
+import { Canvas } from "@/components/Canvas";
 
-import initdraw from "@/draw";
-import { Fullscreen } from "lucide-react";
-import { useEffect, useRef } from "react"
-
-export default function canvas() {
-    const canvasRef = useRef<HTMLCanvasElement>(null)
-
-    useEffect(()=> {
-        
-        if (canvasRef.current) {
-            initdraw(canvasRef.current)
-        }
-        return
-        
-    }, [canvasRef])
+export default async function canvaspage({params} :
+  {
+    params: {
+      roomid : string
+    }
+  }
+) {
+  const roomId = (await params).roomid;
+  console.log(roomId)
+  return <div>
+    <Canvas roomId={roomId} />
+  </div>
     
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-
-
-    return <div>
-        <canvas ref={canvasRef} width={screenWidth} height={screenHeight} className="box-border"></canvas>
-    </div>
 }

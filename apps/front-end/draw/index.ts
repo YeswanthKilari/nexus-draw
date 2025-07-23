@@ -1,3 +1,4 @@
+import axios from "axios";
 
 type Shape = {
     type: "rect";
@@ -12,15 +13,16 @@ type Shape = {
     radius: number;
 }
 
-export default function initdraw(canvas: HTMLCanvasElement) {
+export async function initdraw(canvas: HTMLCanvasElement,roomId: string) {
     const ctx = canvas.getContext("2d");
     
-    const existingshapes: Shape[] = []
+    const existingshapes: Shape[] = await getexistingshapes(roomId)
 
 
   if (!ctx) {
     return;
   }
+    clearcanvas(existingshapes, canvas, ctx);
   ctx.fillStyle = "rgba(0,0,0)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   let clicked = false;
@@ -67,5 +69,17 @@ export default function initdraw(canvas: HTMLCanvasElement) {
                 ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
             }
         })
-  };
+
+    };
+    
+    async function getexistingshapes(roomid: string) {
+        const res = await axios.get(`${HTTP_BACKEND}/chats/${roomid}`);
+        const messages = res.data.messages;
+        const shapes = messages.map((x: { message: string }) => {
+            const messageData = JSON.parse(x.message)
+            return messageData
+        })
+
+        return shapes
+    }
 }
