@@ -6,9 +6,12 @@ import { middleware } from "./middleware.js";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { createroomschema, userschema, signinschema } from "@repo/common/types";
 import { prismaClient } from "@repo/db";
+import cors from "cors"
+
 dotenv.config();
 const app = express();
 const port: number = 3001;
+app.use(cors())
 app.use(express.json());
 
 //@ts-ignore

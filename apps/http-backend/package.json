@@ -13,8 +13,10 @@
     "@repo/common": "workspace:*",
     "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/cors": "^2.8.19",
     "@types/dotenv": "^8.2.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "cors": "^2.8.5",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2"
