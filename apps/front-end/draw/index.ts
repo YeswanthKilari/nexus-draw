@@ -59,11 +59,13 @@ export async function initdraw(canvas: HTMLCanvasElement, roomId: string, socket
         height,
       };
     existingshapes.push(shape);
+    console.log("roomId in mouseup", roomId);
     socket.send(JSON.stringify({
       type: "chat",
       message: JSON.stringify({
         shape
-      })
+      }),
+      roomId: roomId
     }))
   });
 
@@ -100,11 +102,15 @@ export async function initdraw(canvas: HTMLCanvasElement, roomId: string, socket
       });
       
         console.log("API response:", res.data);
-        const messages = res.data.messages;
+        const data = res.data;
+        const messages = Array.isArray(data) ? data : (data?.messages ?? []);
+
+        console.log("Parsed messages:", messages);
+
         const shapes = messages.map((x: { message: string }) => {
-            const messageData = JSON.parse(x.message)
-            return messageData
-        })
+          const messageData = JSON.parse(x.message);
+          return messageData.shape; 
+        });
 
         return shapes
     }
