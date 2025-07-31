@@ -66,7 +66,7 @@ wss.on("connection", function connection(ws, request) {
       switch (parsedData.type) {
         case "join_room":
           if (!parsedData.roomId) return;
-          user.rooms.push(String(parsedData.roomId)); 
+          user.rooms.push(String(parsedData.roomId));
           console.log(`User ${user.userId} joined room ${parsedData.roomId}`);
           break;
 
@@ -79,16 +79,15 @@ wss.on("connection", function connection(ws, request) {
           break;
 
         case "chat":
-          const roomIdNum = Number(parsedData.roomId); 
-          const roomKey = String(parsedData.roomId); 
+          const roomIdNum = Number(parsedData.roomId);
+          const roomKey = String(parsedData.roomId);
           const message = parsedData.message;
 
-          if (!roomIdNum || !message) {
+          if (!Number.isFinite(roomIdNum) || !message) {
             ws.send(JSON.stringify({ error: "Invalid chat format" }));
             return;
           }
 
-          // Save to DB
           await prismaClient.chat.create({
             data: {
               userId: user.userId,
@@ -100,9 +99,10 @@ wss.on("connection", function connection(ws, request) {
             `User ${user.userId} sent message in room ${roomIdNum}: ${message}`
           );
           users.forEach((u) => {
-            if (u.rooms.includes(roomKey)) {
+            if (u.ws !== ws && u.rooms.includes(roomKey)) {
               console.log(
-                `Sending message to user ${u.userId} in room ${roomKey}`)
+                `Sending message to user ${u.userId} in room ${roomKey}`
+              );
               u.ws.send(
                 JSON.stringify({
                   type: "chat",
