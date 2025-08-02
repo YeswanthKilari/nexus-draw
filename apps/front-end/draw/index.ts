@@ -4,26 +4,33 @@ type Shape =
   | { type: "Rectangle"; x: number; y: number; width: number; height: number }
   | { type: "Circle"; centerX: number; centerY: number; radius: number }
   | { type: "Pencil"; points: { x: number; y: number }[] }
-  | { type: "Text"; x: number; y: number; text: string };
+  | { type: "Text"; x: number; y: number; text: string }
+  | { type: "Arrow"; fromX: number; fromY: number; toX: number; toY: number };
 
 export async function initdraw(
   canvas: HTMLCanvasElement,
   roomId: string,
-  socket: WebSocket
+  socket: WebSocket,
+  onShapeChange?: (shapes: Shape[]) => void
 ) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNGNlYTEwMy0xMzI3LTQ0NzYtYWM3ZC1mMzFhMzkyNzg0YTMiLCJpYXQiOjE3NTM2OTA2MjB9.Rwjv4BNuawE-IHMcyppE4BcWvRSNmsYprgYKmsXc-4o";
+ const token =
+   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNGNlYTEwMy0xMzI3LTQ0NzYtYWM3ZC1mMzFhMzkyNzg0YTMiLCJpYXQiOjE3NTM2OTA2MjB9.Rwjv4BNuawE-IHMcyppE4BcWvRSNmsYprgYKmsXc-4o";
 
   const existingShapes: Shape[] = await getExistingShapes(roomId);
   let clicked = false;
   let startX = 0;
   let startY = 0;
   let pencilPoints: { x: number; y: number }[] = [];
+  let draggingShapeIndex: number | null = null;
+  let dragOffset = { x: 0, y: 0 };
 
   renderShapes(existingShapes);
+  if (typeof window !== "undefined") {
+    window.renderShapes = renderShapes;
+  }
 
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
@@ -56,6 +63,27 @@ export async function initdraw(
         );
       }
       clicked = false;
+    } else if (tool === "Move") {
+      for (let i = existingShapes.length - 1; i >= 0; i--) {
+        const shape = existingShapes[i];
+        if (isInsideShape(shape, startX, startY)) {
+          draggingShapeIndex = i;
+          if (shape.type === "Rectangle") {
+            dragOffset.x = startX - shape.x;
+            dragOffset.y = startY - shape.y;
+          } else if (shape.type === "Circle") {
+            dragOffset.x = startX - shape.centerX;
+            dragOffset.y = startY - shape.centerY;
+          } else if (shape.type === "Text") {
+            dragOffset.x = startX - shape.x;
+            dragOffset.y = startY - shape.y;
+          } else if (shape.type === "Arrow") {
+            dragOffset.x = startX - shape.fromX;
+            dragOffset.y = startY - shape.fromY;
+          }
+          break;
+        }
+      }
     }
   });
 
@@ -67,8 +95,12 @@ export async function initdraw(
     const currentY = e.clientY;
     const selectedTool = (window as any).selectedTool || "Circle";
 
-    let shape: Shape;
+    if (selectedTool === "Move") {
+      draggingShapeIndex = null;
+      return;
+    }
 
+    let shape: Shape;
     if (selectedTool === "Rectangle") {
       shape = {
         type: "Rectangle",
@@ -87,12 +119,21 @@ export async function initdraw(
       };
     } else if (selectedTool === "Pencil") {
       shape = { type: "Pencil", points: pencilPoints };
+    } else if (selectedTool === "Arrow") {
+      shape = {
+        type: "Arrow",
+        fromX: startX,
+        fromY: startY,
+        toX: currentX,
+        toY: currentY,
+      };
     } else {
       return;
     }
 
     existingShapes.push(shape);
     renderShapes(existingShapes);
+    onShapeChange?.(existingShapes);
 
     socket.send(
       JSON.stringify({
@@ -112,6 +153,32 @@ export async function initdraw(
 
     if (selectedTool === "Pencil") {
       pencilPoints.push({ x: currentX, y: currentY });
+    }
+
+    if (selectedTool === "Move" && draggingShapeIndex !== null) {
+      const shape = existingShapes[draggingShapeIndex];
+      if (shape.type === "Rectangle") {
+        shape.x = currentX - dragOffset.x;
+        shape.y = currentY - dragOffset.y;
+      } else if (shape.type === "Circle") {
+        shape.centerX = currentX - dragOffset.x;
+        shape.centerY = currentY - dragOffset.y;
+      } else if (shape.type === "Text") {
+        shape.x = currentX - dragOffset.x;
+        shape.y = currentY - dragOffset.y;
+      } else if (shape.type === "Arrow") {
+        const dx = currentX - startX;
+        const dy = currentY - startY;
+        shape.fromX += dx;
+        shape.fromY += dy;
+        shape.toX += dx;
+        shape.toY += dy;
+        startX = currentX;
+        startY = currentY;
+      }
+      renderShapes(existingShapes);
+      onShapeChange?.(existingShapes);
+      return;
     }
 
     renderShapes(existingShapes);
@@ -140,7 +207,6 @@ export async function initdraw(
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    console.log("Rendering shapes:", shapes);
     ctx.strokeStyle = "white";
     ctx.fillStyle = "white";
     for (const shape of shapes) {
@@ -164,6 +230,25 @@ export async function initdraw(
       } else if (shape.type === "Text") {
         ctx.font = "16px Arial";
         ctx.fillText(shape.text, shape.x, shape.y);
+      } else if (shape.type === "Arrow") {
+        const { fromX, fromY, toX, toY } = shape;
+        const headLength = 10;
+        const angle = Math.atan2(toY - fromY, toX - fromX);
+
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.lineTo(toX, toY);
+        ctx.lineTo(
+          toX - headLength * Math.cos(angle - Math.PI / 6),
+          toY - headLength * Math.sin(angle - Math.PI / 6)
+        );
+        ctx.moveTo(toX, toY);
+        ctx.lineTo(
+          toX - headLength * Math.cos(angle + Math.PI / 6),
+          toY - headLength * Math.sin(angle + Math.PI / 6)
+        );
+        ctx.stroke();
+        ctx.closePath();
       }
     }
   }
@@ -173,11 +258,9 @@ export async function initdraw(
       const res = await axios.get(`http://localhost:3001/chats/${roomId}`, {
         headers: { Authorization: token },
       });
-
       const messages = Array.isArray(res.data)
         ? res.data
         : (res.data?.messages ?? []);
-
       return messages.map(
         (msg: { message: string }) => JSON.parse(msg.message).shape
       );
@@ -188,5 +271,27 @@ export async function initdraw(
       );
       return [];
     }
+  }
+
+  function isInsideShape(shape: Shape, x: number, y: number): boolean {
+    if (shape.type === "Rectangle") {
+      return (
+        x >= shape.x &&
+        x <= shape.x + shape.width &&
+        y >= shape.y &&
+        y <= shape.y + shape.height
+      );
+    } else if (shape.type === "Circle") {
+      const dx = x - shape.centerX;
+      const dy = y - shape.centerY;
+      return dx * dx + dy * dy <= shape.radius * shape.radius;
+    } else if (shape.type === "Text") {
+      return (
+        x >= shape.x && x <= shape.x + 100 && y >= shape.y - 16 && y <= shape.y
+      );
+    } else if (shape.type === "Arrow") {
+      return Math.abs(x - shape.fromX) < 10 && Math.abs(y - shape.fromY) < 10;
+    }
+    return false;
   }
 }
