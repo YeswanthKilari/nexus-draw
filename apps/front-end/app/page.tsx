@@ -38,7 +38,7 @@ export default function Home() {
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-black rounded-lg flex items-center justify-center">
                 <Palette className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-black">Drawly</span>
+              <span className="text-xl font-bold text-black">Nexus</span>
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
@@ -232,7 +232,7 @@ export default function Home() {
             Ready to start creating?
           </h2>
           <p className="text-xl text-purple-100 mb-8">
-            Join thousands of teams already using Drawly to bring their ideas to life
+            Join thousands of teams already using Nexus Draw to bring their ideas to life
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -265,7 +265,7 @@ export default function Home() {
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-white rounded-lg flex items-center justify-center">
                   <Palette className="w-5 h-5 text-black" />
                 </div>
-                <span className="text-xl font-bold text-white">Drawly</span>
+                <span className="text-xl font-bold text-white">Nexus</span>
               </div>
               <p className="text-gray-400">
                 Virtual whiteboard for sketching hand-drawn like diagrams
@@ -301,7 +301,7 @@ export default function Home() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Drawly. All rights reserved.</p>
+            <p>&copy; 2024 Nexus. All rights reserved.</p>
           </div>
         </div>
       </footer>

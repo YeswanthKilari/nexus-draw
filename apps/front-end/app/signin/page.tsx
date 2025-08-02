@@ -10,7 +10,7 @@ export default function Home() {
       
     <div className="flex w-full h-screen overflow-hidden text-white">
       <div className="w-[60%] bg-[#080808] flex items-center justify-center">
-        <div className="w-[80%] h-[80%] dark:bg-black bg-blue-300 rounded-xl overflow-hidden">
+        <div className="w-[80%] h-[80%] bg-black  rounded-xl overflow-hidden">
           <video
             className="w-full h-full object-cover  rounded-xl"
             src="/img_video/signin.mp4" 
