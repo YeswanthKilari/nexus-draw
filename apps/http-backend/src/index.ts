@@ -140,6 +140,36 @@ app.get("/chats/:id",middleware, async (req: Request, res: Response): any => {
   }
 })
 
+//@ts-ignore
+app.get("/rooms", middleware, async (req: Request, res: Response) => {
+  try {
+    const rooms = await prismaClient.room.findMany({
+      select: {
+        id: true,
+        slug: true,
+        createdAt: true,
+        adminId: true,
+        // Add more fields as needed
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.json({
+      message: "Rooms fetched successfully",
+      rooms,
+    });
+  } catch (error) {
+    console.error("Error fetching rooms:", error);
+    res.status(500).json({
+      message: "Error fetching rooms",
+      error: (error as Error).message,
+    });
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });

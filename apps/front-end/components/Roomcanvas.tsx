@@ -8,7 +8,7 @@ import { Canvas } from "@/components/Canvas"
 export function Roomcanvas({roomId} : {roomId:string}) {
     
     const [socket, setsocket] = useState<WebSocket | null>(null);
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkNGNlYTEwMy0xMzI3LTQ0NzYtYWM3ZC1mMzFhMzkyNzg0YTMiLCJpYXQiOjE3NTM2OTA2MjB9.Rwjv4BNuawE-IHMcyppE4BcWvRSNmsYprgYKmsXc-4o"
+    const token = localStorage.getItem("token");
     const WS_URL = "ws://localhost:8080";
     useEffect(() => {
         const ws = new WebSocket(`${WS_URL}?token=${token}`);
