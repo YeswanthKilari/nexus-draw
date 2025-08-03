@@ -289,7 +289,22 @@ export async function initdraw(
         x >= shape.x && x <= shape.x + 100 && y >= shape.y - 16 && y <= shape.y
       );
     } else if (shape.type === "Arrow") {
-      return Math.abs(x - shape.fromX) < 10 && Math.abs(y - shape.fromY) < 10;
+      const { fromX, fromY, toX, toY } = shape;
+
+      
+      const dx = toX - fromX;
+      const dy = toY - fromY;
+      const lengthSq = dx * dx + dy * dy;
+
+      let t = ((x - fromX) * dx + (y - fromY) * dy) / lengthSq;
+      t = Math.max(0, Math.min(1, t));
+
+      const projX = fromX + t * dx;
+      const projY = fromY + t * dy;
+
+      const dist = Math.hypot(x - projX, y - projY);
+
+      return dist < 10; 
     }
     return false;
   }
