@@ -1,6 +1,7 @@
 import axios from "axios";
 
-type Shape =
+// Define shape types
+export type Shape =
   | { type: "Rectangle"; x: number; y: number; width: number; height: number }
   | { type: "Circle"; centerX: number; centerY: number; radius: number }
   | { type: "Pencil"; points: { x: number; y: number }[] }
@@ -17,8 +18,9 @@ export async function initdraw(
   if (!ctx) return;
 
   const token = localStorage.getItem("token");
-
+  const userId = localStorage.getItem("userId") || "unknown";
   const existingShapes: Shape[] = await getExistingShapes(roomId);
+
   let clicked = false;
   let startX = 0;
   let startY = 0;
@@ -31,12 +33,20 @@ export async function initdraw(
     window.renderShapes = renderShapes;
   }
 
+  const seenMessages = new Set<string>();
+
   socket.onmessage = (event) => {
     const message = JSON.parse(event.data);
-    if (message.type === "chat") {
+    if (
+      message.type === "chat" &&
+      message.senderId !== userId &&
+      !seenMessages.has(message.message)
+    ) {
+      seenMessages.add(message.message);
       const shape: Shape = JSON.parse(message.message).shape;
       existingShapes.push(shape);
       renderShapes(existingShapes);
+      onShapeChange?.(existingShapes);
     }
   };
 
@@ -51,13 +61,16 @@ export async function initdraw(
       const text = prompt("Enter text:")?.trim();
       if (text) {
         const shape: Shape = { type: "Text", x: startX, y: startY, text };
+        const message = JSON.stringify({ shape });
+        seenMessages.add(message);
         existingShapes.push(shape);
         renderShapes(existingShapes);
         socket.send(
           JSON.stringify({
             type: "chat",
-            message: JSON.stringify({ shape }),
+            message,
             roomId,
+            senderId: userId,
           })
         );
       }
@@ -99,7 +112,8 @@ export async function initdraw(
       return;
     }
 
-    let shape: Shape;
+    let shape: Shape | null = null;
+
     if (selectedTool === "Rectangle") {
       shape = {
         type: "Rectangle",
@@ -109,12 +123,11 @@ export async function initdraw(
         height: currentY - startY,
       };
     } else if (selectedTool === "Circle") {
-      const radius = Math.hypot(currentX - startX, currentY - startY);
       shape = {
         type: "Circle",
         centerX: startX,
         centerY: startY,
-        radius,
+        radius: Math.hypot(currentX - startX, currentY - startY),
       };
     } else if (selectedTool === "Pencil") {
       shape = { type: "Pencil", points: pencilPoints };
@@ -126,21 +139,23 @@ export async function initdraw(
         toX: currentX,
         toY: currentY,
       };
-    } else {
-      return;
     }
 
-    existingShapes.push(shape);
-    renderShapes(existingShapes);
-    onShapeChange?.(existingShapes);
-
-    socket.send(
-      JSON.stringify({
-        type: "chat",
-        message: JSON.stringify({ shape }),
-        roomId,
-      })
-    );
+    if (shape) {
+      const message = JSON.stringify({ shape });
+      seenMessages.add(message);
+      existingShapes.push(shape);
+      renderShapes(existingShapes);
+      onShapeChange?.(existingShapes);
+      socket.send(
+        JSON.stringify({
+          type: "chat",
+          message,
+          roomId,
+          senderId: userId,
+        })
+      );
+    }
   });
 
   canvas.addEventListener("mousemove", (e) => {
@@ -290,8 +305,6 @@ export async function initdraw(
       );
     } else if (shape.type === "Arrow") {
       const { fromX, fromY, toX, toY } = shape;
-
-      
       const dx = toX - fromX;
       const dy = toY - fromY;
       const lengthSq = dx * dx + dy * dy;
@@ -303,8 +316,7 @@ export async function initdraw(
       const projY = fromY + t * dy;
 
       const dist = Math.hypot(x - projX, y - projY);
-
-      return dist < 10; 
+      return dist < 10;
     }
     return false;
   }
