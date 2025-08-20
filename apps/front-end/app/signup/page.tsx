@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import axios from "axios"
+import  { HTTP_BACKEND } from "../config"
 
 export default function Signup() {
   const router = useRouter()
@@ -16,7 +17,7 @@ export default function Signup() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await axios.post("http://localhost:3001/signup", {
+      const res = await axios.post(`${HTTP_BACKEND}/signup`, {
         name,
         username,
         password,

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { HTTP_BACKEND } from "../config"
 
 export default function SignIn() {
   const router = useRouter()
@@ -22,7 +23,7 @@ export default function SignIn() {
     e.preventDefault()
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:3001/signin", {
+      const res = await fetch(`${HTTP_BACKEND}/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
