@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "buildCommand": "pnpm install --shamefully-hoist && pnpm build",
     "lint": "next lint"
   },
   "dependencies": {

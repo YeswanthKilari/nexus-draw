@@ -2,8 +2,8 @@
   "name": "draw-project",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
+    "build": "pnpm --filter './packages/**' build && pnpm --filter './apps/**' build",
+    "dev": "pnpm -r dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"

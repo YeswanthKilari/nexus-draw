@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// Define shape types
 export type Shape =
   | { type: "Rectangle"; x: number; y: number; width: number; height: number }
   | { type: "Circle"; centerX: number; centerY: number; radius: number }
