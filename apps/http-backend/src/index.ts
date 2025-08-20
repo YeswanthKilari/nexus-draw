@@ -10,10 +10,12 @@ import cors from "cors"
 
 dotenv.config();
 const app = express();
-const port: number = 3001;
+const port = process.env.PORT || 3001;
 app.use(cors())
 app.use(express.json());
 
+//@ts-ignore
+app.get("/health", (req, res) => res.send("OK"));
 //@ts-ignore
 app.post("/signup", async (req: Request, res: Response) => {
   const parseddata = userschema.safeParse(req.body);
