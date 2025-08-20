@@ -1,6 +1,18 @@
 {
-  "builds": [
-    { "src": "apps/front-end/next.config.js", "use": "@vercel/next" }
+  "version": 2,
+  "projects": [
+    {
+      "name": "draw-project-frontend",
+      "rootDirectory": "apps/front-end",
+      "buildCommand": "pnpm install --shamefully-hoist && pnpm build",
+      "outputDirectory": ".next",
+      "framework": "nextjs"
+    }
   ],
-  "routes": []
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
 }
