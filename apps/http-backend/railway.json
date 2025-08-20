@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "cd apps/http-backend && pnpm install && pnpm build"
+  },
+  "deploy": {
+    "startCommand": "cd apps/http-backend && pnpm start",
+    "healthcheckPath": "/health",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
