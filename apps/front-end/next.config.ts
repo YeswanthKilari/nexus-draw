@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
+import withTM from "next-transpile-modules-plugin";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: true,
 };
 
-export default nextConfig;
+export default withTM(["@repo/db", "@repo/backend-common"])(nextConfig);
