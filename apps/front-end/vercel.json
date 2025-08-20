@@ -1,0 +1,6 @@
+{
+  "builds": [
+    { "src": "apps/front-end/next.config.js", "use": "@vercel/next" }
+  ],
+  "routes": []
+}
