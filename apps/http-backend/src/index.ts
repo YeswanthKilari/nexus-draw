@@ -10,9 +10,16 @@ import cors from "cors"
 
 dotenv.config();
 const app = express();
-app.use(cors())
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", 
+      // "http://loca", 
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
-const port = process.env.PORT || 3001;
 
 //@ts-ignore
 app.get("/health", (req, res) => res.send("OK"));
@@ -171,7 +178,8 @@ app.get("/rooms", middleware, async (req: Request, res: Response) => {
   }
 });
 
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+const port = process.env.PORT || 8080;
+//@ts-ignore
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server is running on port ${port}`);
 });

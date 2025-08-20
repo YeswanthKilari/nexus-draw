@@ -6,7 +6,10 @@ import { prismaClient } from "@repo/db";
 import dotenv from "dotenv";
 dotenv.config();
 
-const wss = new WebSocketServer({ port: 8080 });
+const port = process.env.PORT || 8080;
+const wss = new WebSocketServer({
+  port: Number(port),
+});
 
 interface Users {
   ws: WebSocket;
