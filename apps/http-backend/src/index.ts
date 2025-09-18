@@ -1,15 +1,19 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 
 import { middleware } from "./middleware.js";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { createroomschema, userschema, signinschema } from "@repo/common/types";
 import { prismaClient } from "@repo/db";
 import cors from "cors"
+import slowDown from "express-slow-down";
 
 dotenv.config();
 const app = express();
+
+
 app.use(
   cors({
     origin: [
@@ -20,6 +24,19 @@ app.use(
   })
 );
 app.use(express.json());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+});
+
+const speedLimiter = slowDown({
+  windowMs: 15 * 60 * 1000,
+  delayAfter: 1,
+  delayMs: () => 2000,
+});
+
+app.use(limiter);
+app.use(speedLimiter);
 
 //@ts-ignore
 app.get("/health", (req, res) => res.send("OK"));
