@@ -90,7 +90,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#080808] via-[#0f0f0f] to-[#1a1a1a] text-white">
-      {/* Animated Background Elements */}
+
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#6e59b7] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#7d6bca] rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse delay-1000"></div>

@@ -2,9 +2,8 @@
 
 import { initdraw } from "@/draw"
 import { useEffect, useRef, useState } from "react"
-import { Circle, Pencil, RectangleHorizontal, Type, ArrowRight, Move, Undo } from "lucide-react"
+import { Circle, Pencil, RectangleHorizontal, Type, ArrowRight, Move } from "lucide-react"
 
-// Define all possible shape tools
 type Shape = "Pencil" | "Rectangle" | "Circle" | "Text" | "Arrow" | "Move"
 
 declare global {
@@ -17,9 +16,9 @@ declare global {
 export function Canvas({ roomId, socket }: { roomId: string; socket: WebSocket }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [selectedTool, setSelectedTool] = useState<Shape>("Circle")
-  const [history, setHistory] = useState<string[]>([])
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [cursor, setCursor] = useState({ x: 0, y: 0 })
+   const textPromptShownRef = useRef(false)
 
   useEffect(() => {
     const resize = () => {
@@ -37,36 +36,12 @@ export function Canvas({ roomId, socket }: { roomId: string; socket: WebSocket }
   useEffect(() => {
     if (!socket) return
     if (canvasRef.current) {
-      initdraw(canvasRef.current, roomId, socket, (shapes) => {
-        setHistory((prev) => [...prev, JSON.stringify(shapes)])
-      })
+      initdraw(canvasRef.current, roomId, socket)
     }
   }, [socket, canvasRef, roomId])
 
-  const handleUndo = () => {
-    setHistory((prev) => {
-      if (prev.length <= 1) return prev
-      const newHistory = prev.slice(0, -1)
-      const shapes = JSON.parse(newHistory[newHistory.length - 1])
-      const canvas = canvasRef.current
-      if (canvas) {
-        const ctx = canvas.getContext("2d")
-        if (ctx) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height)
-          ctx.fillStyle = "black"
-          ctx.fillRect(0, 0, canvas.width, canvas.height)
-          if (typeof window.renderShapes === "function") {
-            window.renderShapes(shapes)
-          }
-        }
-      }
-      return newHistory
-    })
-  }
-
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.ctrlKey && e.key.toLowerCase() === "z") handleUndo()
       if (e.key === "1") setSelectedTool("Pencil")
       if (e.key === "2") setSelectedTool("Rectangle")
       if (e.key === "3") setSelectedTool("Circle")
@@ -80,6 +55,9 @@ export function Canvas({ roomId, socket }: { roomId: string; socket: WebSocket }
 
   function handleCanvasClick(e: React.MouseEvent<HTMLCanvasElement>) {
     if (selectedTool === "Text") {
+      if (textPromptShownRef.current) return
+
+      textPromptShownRef.current = true
       const canvas = canvasRef.current
       if (!canvas) return
       const rect = canvas.getBoundingClientRect()
@@ -91,6 +69,7 @@ export function Canvas({ roomId, socket }: { roomId: string; socket: WebSocket }
       })
       window.dispatchEvent(event)
     }
+     textPromptShownRef.current = false
   }
 
   function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
@@ -113,7 +92,6 @@ export function Canvas({ roomId, socket }: { roomId: string; socket: WebSocket }
       <Topbar
         selectedtool={selectedTool}
         setSelectedTool={setSelectedTool}
-        handleUndo={handleUndo}
       />
 
       <div className="fixed bottom-4 left-4 text-gray-400 bg-black/40 px-4 py-2 text-sm rounded-lg shadow">
@@ -123,7 +101,7 @@ export function Canvas({ roomId, socket }: { roomId: string; socket: WebSocket }
   )
 }
 
-function Topbar({ selectedtool, setSelectedTool, handleUndo }: { selectedtool: Shape; setSelectedTool: (tool: Shape) => void; handleUndo: () => void }) {
+function Topbar({ selectedtool, setSelectedTool }: { selectedtool: Shape; setSelectedTool: (tool: Shape) => void }) {
   const tools: { tool: Shape; icon: React.ReactNode; label: string }[] = [
     { tool: "Pencil", icon: <Pencil />, label: "Pencil (1)" },
     { tool: "Rectangle", icon: <RectangleHorizontal />, label: "Rectangle (2)" },
@@ -145,13 +123,6 @@ function Topbar({ selectedtool, setSelectedTool, handleUndo }: { selectedtool: S
           {icon}
         </button>
       ))}
-      <button
-        title="Undo (Ctrl+Z)"
-        onClick={handleUndo}
-        className="rounded-lg p-2 ml-2 bg-red-500/20 text-white hover:bg-red-500/40 transition"
-      >
-        <Undo className="h-4 w-4" />
-      </button>
     </div>
   )
 }

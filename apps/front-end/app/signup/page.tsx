@@ -10,7 +10,7 @@ import  { HTTP_BACKEND } from "../config"
 export default function Signup() {
   const router = useRouter()
   const [name, setName] = useState("")
-  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
 
@@ -19,14 +19,15 @@ export default function Signup() {
     try {
       const res = await axios.post(`${HTTP_BACKEND}/signup`, {
         name,
-        username,
+        email,
         password,
       })
 
       if (res.status === 200) {
         router.push("/signin")
       }
-    } catch (err: any) {
+    
+    } catch (err : any) {
       setError(err.response?.data?.message || "Signup failed")
     }
   }
@@ -73,10 +74,10 @@ export default function Signup() {
           />
           <Input
             className="border border-white h-11 rounded-2xl"
-            id="username"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <Input
             className="border border-white h-11 rounded-2xl"

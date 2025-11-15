@@ -26,7 +26,7 @@ app.use(
 app.use(express.json());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 100,
 });
 
 const speedLimiter = slowDown({
@@ -53,7 +53,7 @@ app.post("/signup", async (req: Request, res: Response) => {
   try {
     const user = await prismaClient.user.create({
       data: {
-        email: parseddata.data.username,
+        email: parseddata.data.email,
         password: parseddata.data.password,
         name: parseddata.data.name,
       },
@@ -84,7 +84,7 @@ app.post("/signin", async (req: Request, res: Response): any => {
 
   const user = await prismaClient.user.findFirst({
     where: {
-      email: data.data.username,
+      email: data.data.email,
       password: data.data.password,
     },
   });

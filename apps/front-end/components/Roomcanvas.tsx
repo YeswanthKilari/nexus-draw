@@ -29,9 +29,6 @@ export function Roomcanvas({roomId} : {roomId:string}) {
             <p>Connecting to WebSocket...</p>
         </>
     }
-    
-
-
     return <div>
         <Canvas roomId={roomId} socket={socket}/>
     </div>

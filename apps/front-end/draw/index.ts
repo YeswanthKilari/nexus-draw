@@ -13,7 +13,7 @@ export async function initdraw(
   socket: WebSocket,
   onShapeChange?: (shapes: Shape[]) => void
 ) {
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d") || null;
   if (!ctx) return;
 
   const token = localStorage.getItem("token");
@@ -217,6 +217,7 @@ export async function initdraw(
   });
 
   function renderShapes(shapes: Shape[]) {
+    if (ctx === null) return; //could make a threat i think....
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);

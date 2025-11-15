@@ -5,8 +5,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
-
+import { useAuth } from "./hooks/useAuth";
 import { 
   ArrowRight, 
   Users, 
@@ -23,14 +22,18 @@ import {
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
 
+  
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
   const Router = useRouter()
+
+
+  console.log("front-end home page rendered");
   return (
+  
     <main className="min-h-screen bg-white">
-      {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -59,7 +62,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-purple-50 py-20 sm:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -124,7 +126,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -186,7 +187,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Examples Section */}
       <section id="examples" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -225,7 +225,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-black to-purple-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
@@ -238,14 +237,14 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="bg-white text-black hover:bg-gray-100 group"
+              className="border-white text-white hover:bg-white hover:text-black group"
             >
               <Play className="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" />
               Start Drawing Now
             </Button>
             <Button 
               size="lg" 
-              variant="outline" 
+              // variant="outline" 
               className="border-white text-white hover:bg-white hover:text-black group"
             >
               <Github className="w-5 h-5 mr-2" />
@@ -284,9 +283,10 @@ export default function Home() {
             <div>
               <h4 className="font-semibold text-white mb-4">Community</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Discord</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
+                <li><a href="https://github.com/YeswanthKilari" target="_blank" className="hover:text-white transition-colors">GitHub</a></li>
+                <li><a href="https://www.linkedin.com/in/yeswanthkilari/" target="_blank" className="hover:text-white transition-colors">Linkedin</a></li>
+                <li><a href="https://discord.com/users/1236668998440194171" target="_blank" className="hover:text-white transition-colors">Discord</a></li>
+                <li><a href="https://x.com/YeswanthKilari6" target="_blank" className="hover:text-white transition-colors">Twitter</a></li>
               </ul>
             </div>
             
@@ -301,7 +301,7 @@ export default function Home() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Nexus. All rights reserved.</p>
+            <p> Nexus By yeswanth</p>
           </div>
         </div>
       </footer>

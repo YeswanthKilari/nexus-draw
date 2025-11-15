@@ -3,14 +3,27 @@
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { HTTP_BACKEND } from "../config"
+import { useAuth } from "../hooks/useAuth"
 
 export default function SignIn() {
   const router = useRouter()
+  const { isAuthenticated, loading: authLoading } = useAuth();
+
+    useEffect(() => {
+    if (authLoading) return;
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    } else {
+      router.push("/signin");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+
   const [form, setForm] = useState({
     name: "",
-    username: "",
+    email: "",
     password: "",
   })
   const [loading, setLoading] = useState(false)
@@ -38,8 +51,8 @@ export default function SignIn() {
       localStorage.setItem("token", data.token)
 
       router.push("/dashboard") 
-    } catch (err) {
-      alert(err.message)
+    } catch (err : any) {
+      alert("There is an error: " + err.message)
     } finally {
       setLoading(false)
     }
@@ -89,9 +102,9 @@ export default function SignIn() {
           />
           <Input
             className="border border-white h-11 rounded-2xl"
-            id="username"
-            placeholder="Username"
-            value={form.username}
+            id="email"
+            placeholder="Email"
+            value={form.email}
             onChange={handleChange}
           />
           <Input
